@@ -27,7 +27,7 @@ SYMBOL = "XBTUSD"
 ########################################################################################################################
 
 # How many pairs of buy/sell orders to keep open
-ORDER_PAIRS = 6
+ORDER_PAIRS = 1
 
 # ORDER_START_SIZE will be the number of contracts submitted on level 1
 # Number of contracts from level 1 to ORDER_PAIRS - 1 will follow the function
@@ -64,7 +64,7 @@ RELIST_INTERVAL = 0.01
 
 # Position limits - set to True to activate. Values are in contracts.
 # If you exceed a position limit, the bot will log and stop quoting that side.
-CHECK_POSITION_LIMITS = False
+CHECK_POSITION_LIMITS = True
 MIN_POSITION = -10000
 MAX_POSITION = 10000
 
@@ -72,7 +72,7 @@ MAX_POSITION = 10000
 # Use to guarantee a maker rebate.
 # However -- orders that would have matched immediately will instead cancel, and you may end up with
 # unexpected delta. Be careful.
-POST_ONLY = False
+POST_ONLY = True
 
 ########################################################################################################################
 # Misc Behavior, Technicals
