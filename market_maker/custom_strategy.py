@@ -1,6 +1,5 @@
 import sys
 
-from market_maker.settings import settings
 from market_maker.market_maker import OrderManager
 from market_maker.utils import math
 
@@ -14,20 +13,24 @@ class CustomOrderManager(OrderManager):
         # Quote Mid Price = Spot Price + Basis + Skew
         # Skew = (Change in Position / Total Size Quoted) * Weighted Average Half Spread * -1
         #
-        # To simplify,
-        #   mid price = spot price + basis
-        #   quote fixed quantity on each side
+        # To simplify, quote fixed quantity on each side.
         #
-        # Quote Mid Price = Mid Price + Skew
+        # https://bitmex.com/app/fairPriceMarking
+        #
+        # funding basis = funding rate * (time until funding / funding interval)
+        # fair price = spot price * (1 + funding basis)
+        #
+        # Quote Mid Price = Fair Price + Skew
         # New Bid Price = Quote Mid Price * (1 - Half Spread)
         # New Ask Price = Quote Mid Price * (1 + Half Spread)
 
-        ticker = self.get_ticker()
+        #ticker = self.get_ticker()
+        fair_price = self.exchange.get_instrument()['fairPrice']
         change_in_position = self.running_qty - self.starting_qty
-        half_spread = 0.005
+        half_spread = 0.0005
         order_qty = 100
         skew = change_in_position / order_qty * half_spread * -1
-        quote_mid_price = ticker['mid'] + skew
+        quote_mid_price = fair_price + skew
         new_bid_price = quote_mid_price * (1 - half_spread)
         new_ask_price = quote_mid_price * (1 + half_spread)
 
