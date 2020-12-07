@@ -1,5 +1,6 @@
 import sys
 
+from market_maker.settings import settings
 from market_maker.market_maker import OrderManager
 from market_maker.utils import math
 
@@ -23,14 +24,22 @@ class CustomOrderManager(OrderManager):
         # Quote Mid Price = Fair Price + Skew
         # New Bid Price = Quote Mid Price * (1 - Half Spread)
         # New Ask Price = Quote Mid Price * (1 + Half Spread)
+        #
+        # https://ieor.columbia.edu/files/seasdepts/industrial-engineering-operations-research/pdf-files/Borden_D_FESeminar_Sp10.pdf
+        #
+        # New Bid Price = Mid Price + A * forecast - B * MCR - Half Spread
+        # New Ask Price = Mid Price + A * forecast - B * MCR + Half Spread
+        # MCR = running_qty / max_position * volatility
 
-        #ticker = self.get_ticker()
-        fair_price = self.exchange.get_instrument()['fairPrice']
-        change_in_position = self.running_qty - self.starting_qty
+        ticker = self.get_ticker()
+        fair_basis = self.exchange.get_instrument()['fairBasis']
         half_spread = 0.0005
+        volatility = 0.1
         order_qty = 100
-        skew = change_in_position / order_qty * half_spread * -1
-        quote_mid_price = fair_price + skew
+        a = 1
+        b = 100 * half_spread
+        skew = self.running_qty / settings.MAX_POSITION * volatility * b * -1
+        quote_mid_price = ticker['mid'] + a * fair_basis + skew
         new_bid_price = quote_mid_price * (1 - half_spread)
         new_ask_price = quote_mid_price * (1 + half_spread)
 
