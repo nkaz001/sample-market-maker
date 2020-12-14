@@ -9,39 +9,20 @@ class CustomOrderManager(OrderManager):
     """A sample order manager for implementing your own custom strategy"""
 
     def place_orders(self) -> None:
-        # https://blog.bitmex.com/how-to-market-make-bitcoin-derivatives-lesson-2
-        #
-        # Quote Mid Price = Spot Price + Basis + Skew
-        # Skew = (Change in Position / Total Size Quoted) * Weighted Average Half Spread * -1
-        #
-        # To simplify, quote fixed quantity on each side.
-        #
-        # https://bitmex.com/app/fairPriceMarking
-        #
-        # funding basis = funding rate * (time until funding / funding interval)
-        # fair price = spot price * (1 + funding basis)
-        #
-        # Quote Mid Price = Fair Price + Skew
-        # New Bid Price = Quote Mid Price * (1 - Half Spread)
-        # New Ask Price = Quote Mid Price * (1 + Half Spread)
-        #
-        # https://ieor.columbia.edu/files/seasdepts/industrial-engineering-operations-research/pdf-files/Borden_D_FESeminar_Sp10.pdf
-        #
-        # New Bid Price = Mid Price + A * forecast - B * MCR - Half Spread
-        # New Ask Price = Mid Price + A * forecast - B * MCR + Half Spread
-        # MCR = running_qty / max_position * volatility
+        # https://github.com/nkaz001/market-maker-backtest
+
+        order_qty = 100
+        a = 0.030469681552729
+        b = 0.5138382813864965
+        half_spread = 0.0003191754083323428
 
         ticker = self.get_ticker()
         fair_basis = self.exchange.get_instrument()['fairBasis']
-        half_spread = 0.0005
-        volatility = 0.1
-        order_qty = 100
-        a = 1
-        b = 100 * half_spread
-        skew = self.running_qty / settings.MAX_POSITION * volatility * b * -1
-        quote_mid_price = ticker['mid'] + a * fair_basis + skew
-        new_bid_price = quote_mid_price * (1 - half_spread)
-        new_ask_price = quote_mid_price * (1 + half_spread)
+        skew = self.running_qty / settings.MAX_POSITION * b * -1
+        #quote_mid_price = ticker['mid'] + a * fair_basis + skew
+        quote_mid_price = ticker['last'] + a * fair_basis + skew
+        new_bid_price = min(quote_mid_price * (1 - half_spread), ticker['last'] - self.instrument['tickSize'])
+        new_ask_price = max(quote_mid_price * (1 + half_spread), ticker['last'] + self.instrument['tickSize'])
 
         new_bid_price = math.toNearest(new_bid_price, self.instrument['tickSize'])
         new_ask_price = math.toNearest(new_ask_price, self.instrument['tickSize'])
