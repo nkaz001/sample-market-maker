@@ -132,6 +132,11 @@ class ExchangeInterface:
             symbol = self.symbol
         return self.bitmex.instrument(symbol)
 
+    def get_market_depth(self, symbol=None):
+        if symbol is None:
+            symbol = self.symbol
+        return self.bitmex.market_depth(symbol)
+
     def get_margin(self):
         if self.dry_run:
             return {'marginBalance': float(settings.DRY_BTC), 'availableFunds': float(settings.DRY_BTC)}
@@ -276,9 +281,9 @@ class OrderManager:
             "%s Ticker: Buy: %.*f, Sell: %.*f" %
             (self.instrument['symbol'], tickLog, ticker["buy"], tickLog, ticker["sell"])
         )
-        logger.info('Start Positions: Buy: %.*f, Sell: %.*f, Mid: %.*f' %
-                    (tickLog, self.start_position_buy, tickLog, self.start_position_sell,
-                     tickLog, self.start_position_mid))
+        # logger.info('Start Positions: Buy: %.*f, Sell: %.*f, Mid: %.*f' %
+        #             (tickLog, self.start_position_buy, tickLog, self.start_position_sell,
+        #              tickLog, self.start_position_mid))
         return ticker
 
     def get_price_offset(self, index):

@@ -9,18 +9,21 @@ class CustomOrderManager(OrderManager):
     """A sample order manager for implementing your own custom strategy"""
 
     def place_orders(self) -> None:
-        # https://github.com/nkaz001/market-maker-backtest
-
         order_qty = 100
-        a = 0.030469681552729
-        b = 0.5138382813864965
-        half_spread = 0.0003191754083323428
+        a = 707.477466
+        b = 19.8732468
+        half_spread = 0.0108980949
+        depth = 0.05
 
         ticker = self.get_ticker()
-        fair_basis = self.exchange.get_instrument()['fairBasis']
+        mid = (ticker['buy'] + ticker['sell']) / 2
+        market_depth = self.exchange.get_market_depth()
+        buy = sum(map(lambda x: x['size'], filter(lambda x: x['side'] == 'Buy' and x['price'] > mid * (1 - depth), market_depth)))
+        sell = sum(map(lambda x: x['size'], filter(lambda x: x['side'] == 'Sell' and x['price'] < mid * (1 + depth), market_depth)))
+        excessive_buy = (buy - sell) / 100000000
+
         skew = self.running_qty / settings.MAX_POSITION * b * -1
-        #quote_mid_price = ticker['mid'] + a * fair_basis + skew
-        quote_mid_price = ticker['last'] + a * fair_basis + skew
+        quote_mid_price = ticker['last'] + a * excessive_buy + skew
         new_bid_price = min(quote_mid_price * (1 - half_spread), ticker['last'] - self.instrument['tickSize'])
         new_ask_price = max(quote_mid_price * (1 + half_spread), ticker['last'] + self.instrument['tickSize'])
 
