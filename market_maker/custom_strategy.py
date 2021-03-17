@@ -1,7 +1,7 @@
 import sys
 
 from market_maker.settings import settings
-from market_maker.market_maker import OrderManager
+from market_maker.market_maker import OrderManager, XBt_to_XBT
 from market_maker.utils import math
 
 
@@ -16,10 +16,9 @@ class CustomOrderManager(OrderManager):
         depth = 0.05
 
         ticker = self.get_ticker()
-        mid = (ticker['buy'] + ticker['sell']) / 2
         market_depth = self.exchange.get_market_depth()
-        buy = sum(map(lambda x: x['size'], filter(lambda x: x['side'] == 'Buy' and x['price'] > mid * (1 - depth), market_depth)))
-        sell = sum(map(lambda x: x['size'], filter(lambda x: x['side'] == 'Sell' and x['price'] < mid * (1 + depth), market_depth)))
+        buy = sum(map(lambda x: x['size'], filter(lambda x: x['side'] == 'Buy' and x['price'] > ticker['mid'] * (1 - depth), market_depth)))
+        sell = sum(map(lambda x: x['size'], filter(lambda x: x['side'] == 'Sell' and x['price'] < ticker['mid'] * (1 + depth), market_depth)))
         excessive_buy = (buy - sell) / 100000000
 
         skew = self.running_qty / settings.MAX_POSITION * b * -1

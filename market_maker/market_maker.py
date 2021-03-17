@@ -125,7 +125,8 @@ class ExchangeInterface:
     def get_delta(self, symbol=None):
         if symbol is None:
             symbol = self.symbol
-        return self.get_position(symbol)['currentQty']
+        # return self.get_position(symbol)['currentQty']
+        return self.get_position(symbol)['currentQty'] + XBt_to_XBT(self.get_margin()['marginBalance']) * self.get_ticker(symbol)['last']
 
     def get_instrument(self, symbol=None):
         if symbol is None:
