@@ -1,7 +1,7 @@
 import sys
 
 from market_maker.settings import settings
-from market_maker.market_maker import OrderManager, XBt_to_XBT
+from market_maker.market_maker import OrderManager
 from market_maker.utils import math
 
 
