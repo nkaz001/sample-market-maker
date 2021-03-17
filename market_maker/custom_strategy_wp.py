@@ -17,9 +17,9 @@ class CustomOrderManager(OrderManager):
         bid = map(lambda x: (x['price'], x['size']), sorted(filter(lambda x: x['side'] == 'Buy', market_depth), key=lambda x: -x['price']))
         ask = map(lambda x: (x['price'], x['size']), sorted(filter(lambda x: x['side'] == 'Sell', market_depth), key=lambda x: x['price']))
         bid = pd.DataFrame(bid, columns=['price', 'size'])
-        bid = bid[bid['size'].cumsum() <= 50000000]
+        bid = bid[bid['size'].cumsum() <= 130000000]
         ask = pd.DataFrame(ask, columns=['price', 'size'])
-        ask = ask[ask['size'].cumsum() <= 50000000]
+        ask = ask[ask['size'].cumsum() <= 130000000]
         weighted_price = ((bid['price'] * bid['size']).sum() + (ask['price'] * ask['size']).sum()) / (bid['size'].sum() + ask['size'].sum())
         alpha = weighted_price - ticker['last']
 
