@@ -1,5 +1,14 @@
 # BitMEX Market Maker
 
+## Implementation
+ Modified from [BitMEX sample market maker](https://github.com/BitMEX/sample-market-maker)
+
+ Simple Order Book Imbalance [custom_strategy.py](https://github.com/nkaz001/sample-market-maker/blob/master/market_maker/custom_strategy.py)  
+ Weighted Depth Order Book Price [custom_strategy_wp.py](https://github.com/nkaz001/sample-market-maker/blob/master/market_maker/custom_strategy_wp.py)
+ 
+ [Backtest/Optimization examples](https://github.com/nkaz001/algotrading-example)
+#
+
 This is a sample market making bot for use with [BitMEX](https://www.bitmex.com).
 
 It is free to use and modify for your own strategies. It provides the following:
